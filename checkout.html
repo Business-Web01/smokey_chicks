@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smokey Chicks - Checkout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nosifer&display=swap" rel="stylesheet" />
+  <style>
+body {
+  margin: 0;
+  background-color: black;
+  color: white;
+  font-family: 'Arial', sans-serif;
+}
+
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: black;
+  padding: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.flame-font {
+  font-family: 'Nosifer', cursive;
+  font-size: 49px;
+  background: linear-gradient(to right, rgb(255, 0, 0), rgb(255, 123, 0), rgb(8, 8, 4));
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text; 
+  -webkit-text-fill-color: transparent; 
+  text-shadow:
+    0 0 5px red,
+    0 0 10px rgb(255, 94, 0),
+    0 0 15px rgb(3, 3, 2);
+}
+
+.nav-links a {
+  color: white;
+  margin-left: 20px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.food-cart-icon {
+  font-size: 20px;
+  margin-right: 5px;
+}
+
+.checkout-container {
+  padding: 30px;
+  max-width: 500px;
+  margin: auto;
+  color: white;
+  text-align: center;
+}
+
+#checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+  animation: slideIn 1s ease forwards;
+  opacity: 0;
+}
+
+#checkout-form input,
+#checkout-form select {
+  padding: 10px;
+  border: 1px solid orange;
+  border-radius: 5px;
+  background-color: #1a1a1a;
+  color: white;
+}
+
+#checkout-form label {
+  display: inline-block;
+  margin: 0 10px 10px;
+  font-size: 14px;
+  color: orange;
+}
+
+#checkout-summary {
+  margin: 20px 0;
+  font-size: 18px;
+  color: yellow;
+}
+
+#checkout-form button {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+footer {
+  margin-top: 40px;
+  text-align: center;
+  color: grey;
+  font-size: 14px;
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.menu-toggle {
+  font-size: 28px;
+  color: orange;
+  cursor: pointer;
+  display: block;
+  margin-left: auto;
+}
+
+.nav-links {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  background-color: black;
+  border: 1px solid orange;
+  border-radius: 8px;
+  padding: 10px 20px;
+  z-index: 1000;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  margin: 10px 0;
+  display: block;
+}
+
+.nav-links.show {
+  display: flex;
+}
+
+  </style>
+</head>
+<body class="menu-page">
+  <header class="menu-header">
+    <h1 class="flame-font">Smokey Chicks</h1>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+<nav class="nav-links" id="navLinks">
+  <a href="index.html">Home</a>
+  <a href="menu.html">Menu</a>
+  <a href="cart.html">Cart</a>
+  <a href="contact.html">Contact</a>
+</nav>
+
+  </header>
+
+  <main class="checkout-container">
+    <h2>Complete Your Order</h2>
+
+    <form id="checkout-form" class="checkout-form-animate">
+      <label><input type="radio" name="deliveryOption" value="Delivery" required /> Delivery</label>
+      <label><input type="radio" name="deliveryOption" value="Collection" required /> Collection</label>
+
+      <input type="text" name="name" id="customerName" placeholder="Full Name" required />
+      <input type="tel" name="phone" placeholder="Phone Number" required />
+      <input type="text" name="address" id="deliveryAddress" placeholder="Delivery Address" required />
+
+      <select name="payment" required>
+        <option value="">Select Payment Method</option>
+        <option value="Cash">Cash</option>
+        <option value="Card">Card</option>
+      </select>
+
+
+      <input type="hidden" id="orderNumber" name="orderNumber" />
+
+      <button type="submit">Place Order </button>
+    </form>
+
+<div id="checkout-summary">
+  <h3>Order Summary</h3>
+  <ul id="item-list" style="list-style: none; padding: 0; color: orange;"></ul>
+  <p><strong>Total: R<span id="checkout-total">0</span></strong></p>
+  <p style="font-size: 14px; color: yellow;">
+    Hey please give us approximately 20–25 minutes. You will get a notification when the order is ready.
+  </p>
+</div>
+
+<input type="hidden" id="orderNumber" name="orderNumber" />
+
+  </main>
+
+  <footer>
+    Website created by Mbali Mahlangu
+  </footer>
+
+  <script>
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  
+    function updateCartCount() {
+      const count = cart.reduce((sum, item) => sum + item.qty, 0);
+      const counters = document.querySelectorAll("#cart-count");
+      counters.forEach(c => c.textContent = count);
+    }
+  
+    function loadCheckoutSummary() {
+      const itemList = document.getElementById("item-list");
+      const totalDisplay = document.getElementById("checkout-total");
+  
+      if (!itemList || !totalDisplay) return;
+  
+      itemList.innerHTML = "";
+      let total = 0;
+  
+      cart.forEach(item => {
+        const itemTotal = item.price * item.qty;
+        total += itemTotal;
+  
+        const li = document.createElement("li");
+        li.textContent = `${item.qty} x ${item.name} - R${itemTotal}`;
+        itemList.appendChild(li);
+      });
+  
+      totalDisplay.textContent = total;
+    }
+  
+    function generateOrderNumber() {
+      return 'SC' + Math.floor(100000 + Math.random() * 900000);
+    }
+  
+    const form = document.getElementById("checkout-form");
+    if (form) {
+      document.getElementById("orderNumber").value = generateOrderNumber();
+      loadCheckoutSummary();
+      updateCartCount();
+  
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+  
+        const name = document.getElementById("customerName").value;
+        const address = document.getElementById("deliveryAddress").value;
+        const orderNumber = document.getElementById("orderNumber").value;
+        const items = cart.map(item => `${item.qty} x ${item.name}`).join(', ');
+        const message = `Hello Smokey Chicks, I ${name} from ${address} would like to order the following: ${items}. My order number is ${orderNumber}.`;
+  
+        const whatsappURL = `https://wa.me/27813198929?text=${encodeURIComponent(message)}`;
+        window.open(whatsappURL, '_blank');
+  
+        localStorage.removeItem("cart");
+        cart = [];
+        updateCartCount();
+      });
+    }
+  
+    loadCheckoutSummary();
+    updateCartCount();
+
+    function toggleMenu() {
+    const nav = document.getElementById("navLinks");
+    nav.classList.toggle("show");
+  }
+
+  document.addEventListener("click", function (e) {
+    const nav = document.getElementById("navLinks");
+    const toggle = document.querySelector(".menu-toggle");
+    if (!nav.contains(e.target) && !toggle.contains(e.target)) {
+      nav.classList.remove("show");
+    }
+  });
+
+  </script>
+  
+</body>
+</html>
