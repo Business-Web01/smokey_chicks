@@ -160,7 +160,7 @@ footer {
   <a href="index.html">Home</a>
   <a href="menu.html">Menu</a>
   <a href="cart.html">Cart</a>
-  <a href="checkout.html">Contact</a>
+  <a href="contact.html">Contact</a>
 </nav>
 
   </header>
@@ -174,7 +174,9 @@ footer {
 
       <input type="text" name="name" id="customerName" placeholder="Full Name" required />
       <input type="tel" name="phone" placeholder="Phone Number" required />
-      <input type="text" name="address" id="deliveryAddress" placeholder="Delivery Address" required />
+<div id="deliveryAddressContainer">
+  <input type="text" name="address" id="deliveryAddress" placeholder="Delivery Address" />
+</div>
 
       <select name="payment" required>
         <option value="">Select Payment Method</option>
@@ -193,7 +195,7 @@ footer {
   <ul id="item-list" style="list-style: none; padding: 0; color: orange;"></ul>
   <p><strong>Total: R<span id="checkout-total">0</span></strong></p>
   <p style="font-size: 14px; color: yellow;">
-    Hey please give us approximately 20–25 minutes. You will get a notification when the order is ready.
+    Hey please give us approximately 30 minutes. You will receive a notification when the order is ready.
   </p>
 </div>
 
@@ -279,6 +281,33 @@ footer {
     }
   });
 
+
+  // Toggle address visibility based on delivery option
+  const deliveryInputs = document.querySelectorAll('input[name="deliveryOption"]');
+  const addressField = document.getElementById('deliveryAddress');
+  const addressContainer = document.getElementById('deliveryAddressContainer');
+
+  deliveryInputs.forEach(input => {
+    input.addEventListener('change', () => {
+      if (input.value === 'Delivery' && input.checked) {
+        addressContainer.style.display = 'block';
+        addressField.required = true;
+      } else if (input.value === 'Collection' && input.checked) {
+        addressContainer.style.display = 'none';
+        addressField.required = false;
+        addressField.value = '';
+      }
+    });
+  });
+
+  // Set initial state if user refreshes
+  window.addEventListener('DOMContentLoaded', () => {
+    const selected = document.querySelector('input[name="deliveryOption"]:checked');
+    if (selected && selected.value === 'Collection') {
+      addressContainer.style.display = 'none';
+      addressField.required = false;
+    }
+  });
   </script>
   
 </body>
