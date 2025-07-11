@@ -118,18 +118,32 @@ body.menu-page {
 }
 #cart-popup {
   position: fixed;
-  top: 200px; 
-  right: -200px;
-  background: linear-gradient(to left, red, rgb(255, 138, 3));
+  top: 80px; /* Just below the header */
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(to left, red, orange);
   color: white;
-  padding: 12px 25px;
-  border-radius: 5px 0 0 5px;
-  font-weight: bold; 
+  padding: 15px 25px;
+  border-radius: 10px;
+  font-weight: bold;
   font-size: 16px;
-  box-shadow: 0 0 10px red, 0 0 20px rgb(255, 123, 0);
+  box-shadow: 0 0 10px red, 0 0 20px orange;
   z-index: 999;
-  transition: right 0.6s ease-in-out;
+  white-space: normal;
+  word-wrap: break-word;
+  text-align: center;
+  max-width: 90vw;
+  opacity: 1;
+  transition: opacity 1s ease-out;
+  display: none;
 }
+@media screen and (max-width: 480px) {
+  #cart-popup {
+    font-size: 14px;
+    padding: 12px 20px;
+  }
+}
+
 .menu-toggle {
   font-size: 28px;
   color: orange;
@@ -537,16 +551,21 @@ body.menu-page {
   }
 
   function showCartPopup(message) {
-    const popup = document.getElementById("cart-popup");
-    if (!popup) return;
+  const popup = document.getElementById("cart-popup");
+  if (!popup) return;
 
-    popup.textContent = message;
-    popup.classList.add("show");
+  popup.textContent = `Ayoba! ${message} added to your cart.`;
+  popup.style.display = "block";
+  popup.style.opacity = "1";
 
+  setTimeout(() => {
+    popup.style.opacity = "0";
     setTimeout(() => {
-      popup.classList.remove("show");
-    }, 5000);
-  }
+      popup.style.display = "none";
+    }, 1000); 
+  }, 3000); 
+}
+
 
   const canvas = document.getElementById("sparkCanvas");
   if (canvas) {
