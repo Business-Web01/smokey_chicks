@@ -160,7 +160,7 @@ footer {
   <a href="index.html">Home</a>
   <a href="menu.html">Menu</a>
   <a href="cart.html">Cart</a>
-  <a href="checkout.html">Checkout</a>
+  <a href="contact.html">Contact</a>
 </nav>
 
   </header>
@@ -169,8 +169,8 @@ footer {
     <h2>Complete Your Order</h2>
 
     <form id="checkout-form" class="checkout-form-animate">
-      <label><input type="radio" name="deliveryOption" value="Delivery" required /> Delivery</label>
-      <label><input type="radio" name="deliveryOption" value="Collection" required /> Collection</label>
+      <label><input type="radio" id="delivery" name="deliveryOption" value="Delivery" required /> Delivery</label>
+      <label><input type="radio" id="collection" name="deliveryOption" value="Collection" required /> Collection</label>
 
       <input type="text" name="name" id="customerName" placeholder="Full Name" required />
       <input type="tel" name="phone" placeholder="Phone Number" required />
@@ -178,7 +178,7 @@ footer {
   <input type="text" name="address" id="deliveryAddress" placeholder="Delivery Address" />
 </div>
 
-      <select name="payment" required>
+      <select name="payment" id="paymentMethod" required>
         <option value="">Select Payment Method</option>
         <option value="Cash">Cash</option>
         <option value="Card">Card</option>
@@ -207,7 +207,7 @@ footer {
     Website created by Mbali Mahlangu
   </footer>
 
-<script>
+  <script>
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
   function updateCartCount() {
@@ -243,7 +243,9 @@ footer {
 
   const form = document.getElementById("checkout-form");
   if (form) {
-    document.getElementById("orderNumber").value = generateOrderNumber();
+    const orderNumField = document.getElementById("orderNumber");
+    orderNumField.value = generateOrderNumber();
+
     loadCheckoutSummary();
     updateCartCount();
 
@@ -252,15 +254,14 @@ footer {
 
       const name = document.getElementById("customerName").value.trim();
       const address = document.getElementById("deliveryAddress").value.trim();
-      const payment = document.getElementById("paymentMethod").value;
-      const orderNumber = document.getElementById("orderNumber").value;
+      const payment = form.querySelector('select[name="payment"]').value;
+      const orderNumber = orderNumField.value;
 
       if (!name || !payment || (document.getElementById("delivery").checked && !address)) {
-        alert("Please fill all required fields.");
+        alert("Please fill in all required fields.");
         return;
       }
 
-      // Generate item details
       const itemDetails = cart.map(item => {
         let bread = "";
         if (
@@ -278,13 +279,15 @@ footer {
         return `${item.qty} x ${item.name}${bread ? " with " + bread : ""} and ${sauce.toLowerCase()}`;
       }).join(", ");
 
-      const finalAddress = document.getElementById("delivery").checked ? `from ${address}` : "for collection";
+      const finalAddress = document.getElementById("delivery").checked
+        ? `from ${address}`
+        : "for collection";
+
       const message = `Hello Smokey Chicks, I ${name} ${finalAddress} would like to place an order for ${itemDetails}. My payment method is ${payment}. My order number is ${orderNumber}. Thank you.`;
 
       const whatsappURL = `https://wa.me/27813198929?text=${encodeURIComponent(message)}`;
       window.open(whatsappURL, '_blank');
 
-      // Clear cart
       localStorage.removeItem("cart");
       cart = [];
       updateCartCount();
@@ -294,7 +297,7 @@ footer {
   loadCheckoutSummary();
   updateCartCount();
 
-  // 🔁 Menu toggle
+  // Toggle menu for mobile
   function toggleMenu() {
     const nav = document.getElementById("navLinks");
     nav.classList.toggle("show");
@@ -308,7 +311,7 @@ footer {
     }
   });
 
-  // 📍 Show/Hide address input
+  // Show/hide address for Delivery option
   const deliveryInputs = document.querySelectorAll('input[name="deliveryOption"]');
   const addressField = document.getElementById('deliveryAddress');
   const addressContainer = document.getElementById('deliveryAddressContainer');
@@ -326,6 +329,7 @@ footer {
     });
   });
 
+  // Handle refresh state for delivery vs collection
   window.addEventListener('DOMContentLoaded', () => {
     const selected = document.querySelector('input[name="deliveryOption"]:checked');
     if (selected && selected.value === 'Collection') {
