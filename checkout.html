@@ -207,68 +207,95 @@ footer {
     Website created by Mbali Mahlangu
   </footer>
 
-  <script>
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  
-    function updateCartCount() {
-      const count = cart.reduce((sum, item) => sum + item.qty, 0);
-      const counters = document.querySelectorAll("#cart-count");
-      counters.forEach(c => c.textContent = count);
-    }
-  
-    function loadCheckoutSummary() {
-      const itemList = document.getElementById("item-list");
-      const totalDisplay = document.getElementById("checkout-total");
-  
-      if (!itemList || !totalDisplay) return;
-  
-      itemList.innerHTML = "";
-      let total = 0;
-  
-      cart.forEach(item => {
-        const itemTotal = item.price * item.qty;
-        total += itemTotal;
-  
-        const li = document.createElement("li");
-        li.textContent = `${item.qty} x ${item.name} - R${itemTotal}`;
-        itemList.appendChild(li);
-      });
-  
-      totalDisplay.textContent = total;
-    }
-  
-    function generateOrderNumber() {
-      return 'SC' + Math.floor(100000 + Math.random() * 900000);
-    }
-  
-    const form = document.getElementById("checkout-form");
-    if (form) {
-      document.getElementById("orderNumber").value = generateOrderNumber();
-      loadCheckoutSummary();
-      updateCartCount();
-  
-      form.addEventListener("submit", function (e) {
-        e.preventDefault();
-  
-        const name = document.getElementById("customerName").value;
-        const address = document.getElementById("deliveryAddress").value;
-        const orderNumber = document.getElementById("orderNumber").value;
-        const items = cart.map(item => `${item.qty} x ${item.name}`).join(', ');
-        const message = `Hello Smokey Chicks, I ${name} from ${address} would like to order the following: ${items}. My order number is ${orderNumber}.`;
-  
-        const whatsappURL = `https://wa.me/27815540507?text=${encodeURIComponent(message)}`;
-        window.open(whatsappURL, '_blank');
-  
-        localStorage.removeItem("cart");
-        cart = [];
-        updateCartCount();
-      });
-    }
-  
+<script>
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  function updateCartCount() {
+    const count = cart.reduce((sum, item) => sum + item.qty, 0);
+    const counters = document.querySelectorAll("#cart-count");
+    counters.forEach(c => c.textContent = count);
+  }
+
+  function loadCheckoutSummary() {
+    const itemList = document.getElementById("item-list");
+    const totalDisplay = document.getElementById("checkout-total");
+
+    if (!itemList || !totalDisplay) return;
+
+    itemList.innerHTML = "";
+    let total = 0;
+
+    cart.forEach(item => {
+      const itemTotal = item.price * item.qty;
+      total += itemTotal;
+
+      const li = document.createElement("li");
+      li.textContent = `${item.qty} x ${item.name} - R${itemTotal}`;
+      itemList.appendChild(li);
+    });
+
+    totalDisplay.textContent = total;
+  }
+
+  function generateOrderNumber() {
+    return 'SC' + Math.floor(100000 + Math.random() * 900000);
+  }
+
+  const form = document.getElementById("checkout-form");
+  if (form) {
+    document.getElementById("orderNumber").value = generateOrderNumber();
     loadCheckoutSummary();
     updateCartCount();
 
-    function toggleMenu() {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("customerName").value.trim();
+      const address = document.getElementById("deliveryAddress").value.trim();
+      const payment = document.getElementById("paymentMethod").value;
+      const orderNumber = document.getElementById("orderNumber").value;
+
+      if (!name || !payment || (document.getElementById("delivery").checked && !address)) {
+        alert("Please fill all required fields.");
+        return;
+      }
+
+      // Generate item details
+      const itemDetails = cart.map(item => {
+        let bread = "";
+        if (
+          item.name.toLowerCase().includes("kota") ||
+          item.name.toLowerCase().includes("dagwood")
+        ) {
+          bread = item.bread ? item.bread.toLowerCase() : "";
+        }
+
+        let sauce = item.sauce || "";
+        if (sauce.toLowerCase() === "plain sauce") {
+          sauce = "plain (no hot)";
+        }
+
+        return `${item.qty} x ${item.name}${bread ? " with " + bread : ""} and ${sauce.toLowerCase()}`;
+      }).join(", ");
+
+      const finalAddress = document.getElementById("delivery").checked ? `from ${address}` : "for collection";
+      const message = `Hello Smokey Chicks, I ${name} ${finalAddress} would like to place an order for ${itemDetails}. My payment method is ${payment}. My order number is ${orderNumber}. Thank you.`;
+
+      const whatsappURL = `https://wa.me/27813198929?text=${encodeURIComponent(message)}`;
+      window.open(whatsappURL, '_blank');
+
+      // Clear cart
+      localStorage.removeItem("cart");
+      cart = [];
+      updateCartCount();
+    });
+  }
+
+  loadCheckoutSummary();
+  updateCartCount();
+
+  // 🔁 Menu toggle
+  function toggleMenu() {
     const nav = document.getElementById("navLinks");
     nav.classList.toggle("show");
   }
@@ -281,8 +308,7 @@ footer {
     }
   });
 
-
-  // Toggle address visibility based on delivery option
+  // 📍 Show/Hide address input
   const deliveryInputs = document.querySelectorAll('input[name="deliveryOption"]');
   const addressField = document.getElementById('deliveryAddress');
   const addressContainer = document.getElementById('deliveryAddressContainer');
@@ -300,7 +326,6 @@ footer {
     });
   });
 
-  // Set initial state if user refreshes
   window.addEventListener('DOMContentLoaded', () => {
     const selected = document.querySelector('input[name="deliveryOption"]:checked');
     if (selected && selected.value === 'Collection') {
@@ -308,7 +333,8 @@ footer {
       addressField.required = false;
     }
   });
-  </script>
+</script>
+
   
 </body>
 </html>
