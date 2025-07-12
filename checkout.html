@@ -207,7 +207,8 @@ footer {
     Website created by Mbali Mahlangu
   </footer>
 
-  <script>
+  
+<script>
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
   function updateCartCount() {
@@ -262,7 +263,11 @@ footer {
         return;
       }
 
-      const itemDetails = cart.map(item => {
+      let total = 0;
+      const itemLines = cart.map(item => {
+        const itemTotal = item.price * item.qty;
+        total += itemTotal;
+
         let bread = "";
         if (
           item.name.toLowerCase().includes("kota") ||
@@ -276,14 +281,26 @@ footer {
           sauce = "plain (no hot)";
         }
 
-        return `${item.qty} x ${item.name}${bread ? " with " + bread : ""} and ${sauce.toLowerCase()}`;
-      }).join(", ");
+        return `- ${item.qty} x ${item.name}${bread ? " with " + bread : ""} and ${sauce.toLowerCase()}`;
+      });
 
       const finalAddress = document.getElementById("delivery").checked
-        ? `from ${address}`
-        : "for collection";
+        ? address
+        : "Collection";
 
-      const message = `Hello Smokey Chicks, I ${name} ${finalAddress} would like to place an order for ${itemDetails}. My payment method is ${payment}. My order number is ${orderNumber}. Thank you.`;
+      const message = 
+`🔥 Hello Smokey Chicks!
+
+👤 Name: ${name}
+📍 Address: ${finalAddress}
+🛒 Order:
+${itemLines.join('\n')}
+
+💳 Payment Method: ${payment}
+🧾 Order Number: ${orderNumber}
+💰 Total: R${total}
+
+🙏 Thank you!`;
 
       const whatsappURL = `https://wa.me/27813198929?text=${encodeURIComponent(message)}`;
       window.open(whatsappURL, '_blank');
@@ -329,7 +346,6 @@ footer {
     });
   });
 
-  // Handle refresh state for delivery vs collection
   window.addEventListener('DOMContentLoaded', () => {
     const selected = document.querySelector('input[name="deliveryOption"]:checked');
     if (selected && selected.value === 'Collection') {
@@ -338,6 +354,7 @@ footer {
     }
   });
 </script>
+
 
   
 </body>
