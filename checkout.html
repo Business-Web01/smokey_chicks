@@ -206,8 +206,6 @@ footer {
   <footer>
     Website created by Mbali Mahlangu
   </footer>
-
-  
 <script>
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
@@ -244,9 +242,7 @@ footer {
 
   const form = document.getElementById("checkout-form");
   if (form) {
-    const orderNumField = document.getElementById("orderNumber");
-    orderNumField.value = generateOrderNumber();
-
+    document.getElementById("orderNumber").value = generateOrderNumber();
     loadCheckoutSummary();
     updateCartCount();
 
@@ -255,25 +251,31 @@ footer {
 
       const name = document.getElementById("customerName").value.trim();
       const address = document.getElementById("deliveryAddress").value.trim();
-      const payment = form.querySelector('select[name="payment"]').value;
-      const orderNumber = orderNumField.value;
+      const orderNumber = document.getElementById("orderNumber").value;
+      const deliveryOption = document.querySelector('input[name="deliveryOption"]:checked')?.value;
+      const payment = form.payment.value;
+      const total = document.getElementById("checkout-total").textContent;
 
-      if (!name || !payment || (document.getElementById("delivery").checked && !address)) {
-        alert("Please fill in all required fields.");
+      if (!name || !payment || (deliveryOption === "Delivery" && !address)) {
+        alert("Please fill all required fields.");
         return;
       }
 
-      let total = 0;
-      const itemLines = cart.map(item => {
-        const itemTotal = item.price * item.qty;
-        total += itemTotal;
+      // Handle "need change?" prompt
+      let changeMessage = "";
+      if (payment === "Cash" && deliveryOption === "Delivery") {
+        const needChange = confirm("Will you need change?");
+        changeMessage = needChange ? "💸 *Customer needs change.*" : "✅ *No change required.*";
+      }
 
+      // Format item details
+      const itemDetails = cart.map(item => {
         let bread = "";
         if (
           item.name.toLowerCase().includes("kota") ||
           item.name.toLowerCase().includes("dagwood")
         ) {
-          bread = item.bread ? item.bread.toLowerCase() : "";
+          bread = item.bread ? ` with ${item.bread}` : "";
         }
 
         let sauce = item.sauce || "";
@@ -281,30 +283,34 @@ footer {
           sauce = "plain (no hot)";
         }
 
-        return `- ${item.qty} x ${item.name}${bread ? " with " + bread : ""} and ${sauce.toLowerCase()}`;
-      });
+        return `• ${item.qty} x ${item.name}${bread} and ${sauce}`;
+      }).join("\n");
 
-      const finalAddress = document.getElementById("delivery").checked
-        ? address
-        : "Collection";
+      const locationText = deliveryOption === "Delivery"
+        ? `🏠 *Delivery Address:* ${address}`
+        : "📦 *Collection at the store*";
 
-      const message = 
-`🔥 Hello Smokey Chicks!
+      const message = `
+🔥 *Smokey Chicks Order Alert!* 🔥
 
-👤 Name: ${name}
-📍 Address: ${finalAddress}
-🛒 Order:
-${itemLines.join('\n')}
+👤 *Name:* ${name}
+📦 *Order Number:* ${orderNumber}
+${locationText}
 
-💳 Payment Method: ${payment}
-🧾 Order Number: ${orderNumber}
-💰 Total: R${total}
+🛍️ *Order Details:*
+${itemDetails}
 
-🙏 Thank you!`;
+💰 *Total:* R${total}
+💳 *Payment Method:* ${payment}
+${changeMessage ? `\n${changeMessage}` : ""}
 
-      const whatsappURL = `https://wa.me/27815540507?text=${encodeURIComponent(message)}`;
+🙏 Thank you for your order!
+      `;
+
+      const whatsappURL = `https://wa.me/27813198929?text=${encodeURIComponent(message.trim())}`;
       window.open(whatsappURL, '_blank');
 
+      // Clear cart
       localStorage.removeItem("cart");
       cart = [];
       updateCartCount();
@@ -314,7 +320,7 @@ ${itemLines.join('\n')}
   loadCheckoutSummary();
   updateCartCount();
 
-  // Toggle menu for mobile
+  // 🔁 Menu toggle
   function toggleMenu() {
     const nav = document.getElementById("navLinks");
     nav.classList.toggle("show");
@@ -328,7 +334,7 @@ ${itemLines.join('\n')}
     }
   });
 
-  // Show/hide address for Delivery option
+  // 📍 Show/Hide address input
   const deliveryInputs = document.querySelectorAll('input[name="deliveryOption"]');
   const addressField = document.getElementById('deliveryAddress');
   const addressContainer = document.getElementById('deliveryAddressContainer');
@@ -338,7 +344,7 @@ ${itemLines.join('\n')}
       if (input.value === 'Delivery' && input.checked) {
         addressContainer.style.display = 'block';
         addressField.required = true;
-      } else if (input.value === 'Collection' && input.checked) {
+      } else {
         addressContainer.style.display = 'none';
         addressField.required = false;
         addressField.value = '';
@@ -354,7 +360,6 @@ ${itemLines.join('\n')}
     }
   });
 </script>
-
 
   
 </body>
