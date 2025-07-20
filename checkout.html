@@ -240,9 +240,31 @@ footer {
     return 'SC' + Math.floor(100000 + Math.random() * 900000);
   }
 
+  function saveOrderToLocal(cartItems, total, orderType) {
+    const orderLog = JSON.parse(localStorage.getItem("orderLog") || "[]");
+    const date = new Date().toLocaleString();
+
+    const cleanedItems = cartItems.map(item => {
+      let sauce = item.sauce || "";
+      if (sauce.toLowerCase() === "plain sauce") sauce = "plain (no hot)";
+      return `${item.qty}x ${item.name}${item.bread ? ' with ' + item.bread : ''} and ${sauce}`;
+    });
+
+    orderLog.push({
+      date,
+      items: cleanedItems,
+      total,
+      type: orderType
+    });
+
+    localStorage.setItem("orderLog", JSON.stringify(orderLog));
+  }
+
   const form = document.getElementById("checkout-form");
   if (form) {
-    document.getElementById("orderNumber").value = generateOrderNumber();
+    const orderNumField = document.getElementById("orderNumber");
+    orderNumField.value = generateOrderNumber();
+
     loadCheckoutSummary();
     updateCartCount();
 
@@ -251,31 +273,27 @@ footer {
 
       const name = document.getElementById("customerName").value.trim();
       const address = document.getElementById("deliveryAddress").value.trim();
-      const orderNumber = document.getElementById("orderNumber").value;
-      const deliveryOption = document.querySelector('input[name="deliveryOption"]:checked')?.value;
-      const payment = form.payment.value;
-      const total = document.getElementById("checkout-total").textContent;
+      const payment = form.querySelector('select[name="payment"]').value;
+      const orderNumber = orderNumField.value;
 
-      if (!name || !payment || (deliveryOption === "Delivery" && !address)) {
-        alert("Please fill all required fields.");
+      if (!name || !payment || (document.getElementById("delivery").checked && !address)) {
+        alert("Please fill in all required fields.");
         return;
       }
 
-      // Handle "need change?" prompt
-      let changeMessage = "";
-      if (payment === "Cash" && deliveryOption === "Delivery") {
-        const needChange = confirm("Will you need change?");
-        changeMessage = needChange ? "💸 *Customer needs change.*" : "✅ *No change required.*";
+      let changeNote = "";
+      if (payment === "Cash" && document.getElementById("delivery").checked) {
+        const needsChange = confirm("Will you need change?");
+        changeNote = needsChange ? " (Customer requires change)" : " (No change needed)";
       }
 
-      // Format item details
       const itemDetails = cart.map(item => {
         let bread = "";
         if (
           item.name.toLowerCase().includes("kota") ||
           item.name.toLowerCase().includes("dagwood")
         ) {
-          bread = item.bread ? ` with ${item.bread}` : "";
+          bread = item.bread ? item.bread.toLowerCase() : "";
         }
 
         let sauce = item.sauce || "";
@@ -283,34 +301,33 @@ footer {
           sauce = "plain (no hot)";
         }
 
-        return `• ${item.qty} x ${item.name}${bread} and ${sauce}`;
-      }).join("\n");
+        return `${item.qty} x ${item.name}${bread ? " with " + bread : ""} and ${sauce.toLowerCase()}`;
+      }).join(", ");
 
-      const locationText = deliveryOption === "Delivery"
-        ? `🏠 *Delivery Address:* ${address}`
-        : "📦 *Collection at the store*";
+      const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const finalAddress = document.getElementById("delivery").checked
+        ? `from ${address}`
+        : "for collection";
 
       const message = `
-🔥 *Smokey Chicks Order Alert!* 🔥
+🔥 *NEW ORDER* 🔥
 
-👤 *Name:* ${name}
-📦 *Order Number:* ${orderNumber}
-${locationText}
+👤 Name: *${name}*
+📦 Order: ${itemDetails}
+💰 Total: *R${total}*
+📍 Type: *${document.getElementById("delivery").checked ? "Delivery" : "Collection"}*
+🏠 Address: ${document.getElementById("delivery").checked ? address : "N/A"}
+💳 Payment: ${payment}${changeNote}
+🧾 Order #: *${orderNumber}*
 
-🛍️ *Order Details:*
-${itemDetails}
+Thank you for choosing *Smokey Chicks*! 🔥🐔
+      `.trim();
 
-💰 *Total:* R${total}
-💳 *Payment Method:* ${payment}
-${changeMessage ? `\n${changeMessage}` : ""}
-
-🙏 Thank you for your order!
-      `;
-
-      const whatsappURL = `https://wa.me/27815540507 ?text=${encodeURIComponent(message.trim())}`;
+      const whatsappURL = `https://wa.me/27813198929?text=${encodeURIComponent(message)}`;
       window.open(whatsappURL, '_blank');
 
-      // Clear cart
+      saveOrderToLocal(cart, total, document.getElementById("delivery").checked ? "Delivery" : "Collection");
+
       localStorage.removeItem("cart");
       cart = [];
       updateCartCount();
@@ -320,7 +337,7 @@ ${changeMessage ? `\n${changeMessage}` : ""}
   loadCheckoutSummary();
   updateCartCount();
 
-  // 🔁 Menu toggle
+  // Toggle mobile menu
   function toggleMenu() {
     const nav = document.getElementById("navLinks");
     nav.classList.toggle("show");
@@ -334,7 +351,7 @@ ${changeMessage ? `\n${changeMessage}` : ""}
     }
   });
 
-  // 📍 Show/Hide address input
+  // Toggle address visibility based on delivery option
   const deliveryInputs = document.querySelectorAll('input[name="deliveryOption"]');
   const addressField = document.getElementById('deliveryAddress');
   const addressContainer = document.getElementById('deliveryAddressContainer');
@@ -344,7 +361,7 @@ ${changeMessage ? `\n${changeMessage}` : ""}
       if (input.value === 'Delivery' && input.checked) {
         addressContainer.style.display = 'block';
         addressField.required = true;
-      } else {
+      } else if (input.value === 'Collection' && input.checked) {
         addressContainer.style.display = 'none';
         addressField.required = false;
         addressField.value = '';
@@ -352,6 +369,7 @@ ${changeMessage ? `\n${changeMessage}` : ""}
     });
   });
 
+  // Set initial visibility state
   window.addEventListener('DOMContentLoaded', () => {
     const selected = document.querySelector('input[name="deliveryOption"]:checked');
     if (selected && selected.value === 'Collection') {
