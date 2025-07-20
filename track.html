@@ -13,11 +13,19 @@
       padding: 20px;
     }
 
+    #overlay {
+      padding: 20px;
+      border-radius: 10px;
+    }
+
     #passwordPrompt {
       background: white;
       padding: 20px;
       border-radius: 8px;
       text-align: center;
+      max-width: 400px;
+      margin: 50px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
 
     #ordersTable {
@@ -67,188 +75,185 @@
 
     #content {
       display: none;
+      margin-top: 30px;
     }
+
     .menu-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: black;
-  padding: 20px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: black;
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
 
-.flame-font {
-  font-family: 'Nosifer', cursive;
-  font-size: 49px;
-  background: linear-gradient(to right, rgb(255, 0, 0), rgb(255, 123, 0), rgb(8, 8, 4));
-  color: transparent;
-  background-clip: text;
-  -webkit-background-clip: text; 
-  -webkit-text-fill-color: transparent; 
-  text-shadow:
-    0 0 5px red,
-    0 0 10px rgb(255, 94, 0),
-    0 0 15px rgb(3, 3, 2);
-}
+    .flame-font {
+      font-family: 'Nosifer', cursive;
+      font-size: 49px;
+      background: linear-gradient(to right, rgb(255, 0, 0), rgb(255, 123, 0), rgb(8, 8, 4));
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text; 
+      -webkit-text-fill-color: transparent; 
+      text-shadow:
+        0 0 5px red,
+        0 0 10px rgb(255, 94, 0),
+        0 0 15px rgb(3, 3, 2);
+    }
 
-.nav-links a {
-  color: white;
-  margin-left: 20px;
-  text-decoration: none;
-  font-weight: bold;
-}
+    .nav-links a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
 
-.menu-toggle {
-  font-size: 28px;
-  color: orange;
-  cursor: pointer;
-  display: block;
-  margin-left: auto;
-}
+    .menu-toggle {
+      font-size: 28px;
+      color: orange;
+      cursor: pointer;
+      display: block;
+      margin-left: auto;
+    }
 
-.nav-links {
-  display: none;
-  flex-direction: column;
-  position: absolute;
-  top: 70px;
-  right: 20px;
-  background-color: black;
-  border: 1px solid orange;
-  border-radius: 8px;
-  padding: 10px 20px;
-  z-index: 1000;
-}
+    .nav-links {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 70px;
+      right: 20px;
+      background-color: black;
+      border: 1px solid orange;
+      border-radius: 8px;
+      padding: 10px 20px;
+      z-index: 1000;
+    }
 
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  margin: 10px 0;
-  display: block;
-}
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      margin: 10px 0;
+      display: block;
+    }
 
-.nav-links.show {
-  display: flex;
-}
-
+    .nav-links.show {
+      display: flex;
+    }
   </style>
 </head>
-<body>
 <body class="menu-page">
   <header class="menu-header">
     <h1 class="flame-font">Smokey Chicks</h1>
     <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-
-<nav class="nav-links" id="navLinks">
-  <a href="index.html">Home</a>
-  <a href="menu.html">Menu</a>
-  <a href="cart.html">Cart</a>
-  <a href="checkout.html">Checkout</a>
-  <a href="track.html">Track ME!</a>
-
-</nav>
-
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html">Home</a>
+      <a href="menu.html">Menu</a>
+      <a href="cart.html">Cart</a>
+      <a href="checkout.html">Checkout</a>
+      <a href="track.html">Track ME!</a>
+    </nav>
   </header>
 
-  <div id="passwordPrompt">
-    <h2>Enter Passcode</h2>
-    <input type="password" id="passcode" maxlength="4" />
-    <br><br>
-    <button onclick="checkPasscode()">Enter</button>
+  <div id="overlay">
+    <div id="passwordPrompt">
+      <h2>Enter Passcode</h2>
+      <input type="password" id="passcode" maxlength="4" />
+      <br><br>
+      <button onclick="checkPasscode()">Enter</button>
+    </div>
   </div>
-</div>
 
-<div id="content">
-  <h1>📊 Smokey Chicks 2025 Order Summary</h1>
-  <table id="ordersTable">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Items Ordered</th>
-        <th>Total</th>
-        <th>Type</th>
-      </tr>
-    </thead>
-    <tbody id="ordersBody"></tbody>
-  </table>
-</div>
+  <div id="content">
+    <h1>📊 Smokey Chicks 2025 Order Summary</h1>
+    <table id="ordersTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Items Ordered</th>
+          <th>Total</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody id="ordersBody"></tbody>
+    </table>
+  </div>
 
-<script>
-  const correctCode = "2025";
+  <script>
+    const encoded = btoa("2025"); // Encode passcode for light obfuscation
 
-  function checkPasscode() {
-    const input = document.getElementById("passcode").value;
-    if (input === correctCode) {
-      document.getElementById("overlay").style.display = "none";
-      document.getElementById("content").style.display = "block";
-      loadOrders();
-    } else {
-      flashError();
-    }
-  }
-
-  function flashError() {
-    const overlay = document.getElementById("overlay");
-    overlay.classList.add("flash-red");
-
-    showPopup();
-
-    setTimeout(() => {
-      overlay.classList.remove("flash-red");
-      document.getElementById("passcode").value = "";
-    }, 5000);
-  }
-
-  function showPopup() {
-    const popup = document.createElement("div");
-    popup.className = "popup-message";
-    popup.innerHTML = `
-      <img src="https://cdn-icons-png.flaticon.com/512/463/463612.png" alt="Error Icon">
-      <strong>Oops!</strong><br>You've entered the wrong passcode.
-    `;
-    document.body.appendChild(popup);
-
-    setTimeout(() => {
-      popup.remove();
-    }, 5000);
-  }
-
-  function loadOrders() {
-    const orders = JSON.parse(localStorage.getItem("orderLog") || "[]");
-    const tbody = document.getElementById("ordersBody");
-    tbody.innerHTML = "";
-
-    if (orders.length === 0) {
-      tbody.innerHTML = "<tr><td colspan='4'>No orders placed yet.</td></tr>";
-      return;
+    function checkPasscode() {
+      const input = document.getElementById("passcode").value.trim();
+      if (btoa(input) === encoded) {
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("content").style.display = "block";
+        loadOrders();
+      } else {
+        flashError();
+      }
     }
 
-    orders.forEach(order => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${order.date}</td>
-        <td>${order.items}</td>
-        <td>R${order.total.toFixed(2)}</td>
-        <td>${order.type}</td>
+    function flashError() {
+      const overlay = document.getElementById("overlay");
+      overlay.classList.add("flash-red");
+
+      showPopup();
+
+      setTimeout(() => {
+        overlay.classList.remove("flash-red");
+        document.getElementById("passcode").value = "";
+      }, 5000);
+    }
+
+    function showPopup() {
+      const popup = document.createElement("div");
+      popup.className = "popup-message";
+      popup.innerHTML = `
+        <img src="https://cdn-icons-png.flaticon.com/512/463/463612.png" alt="Error Icon">
+        <strong>Oops!</strong><br>You've entered the wrong passcode.
       `;
-      tbody.appendChild(row);
-    });
-  }
+      document.body.appendChild(popup);
 
-  function toggleMenu() {
-    const nav = document.getElementById("navLinks");
-    nav.classList.toggle("show");
-  }
-
-  document.addEventListener("click", function (e) {
-    const nav = document.getElementById("navLinks");
-    const toggle = document.querySelector(".menu-toggle");
-    if (!nav.contains(e.target) && !toggle.contains(e.target)) {
-      nav.classList.remove("show");
+      setTimeout(() => {
+        popup.remove();
+      }, 5000);
     }
-  });
-</script>
 
+    function loadOrders() {
+      const orders = JSON.parse(localStorage.getItem("orderLog") || "[]");
+      const tbody = document.getElementById("ordersBody");
+      tbody.innerHTML = "";
+
+      if (orders.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='4'>No orders placed yet.</td></tr>";
+        return;
+      }
+
+      orders.forEach(order => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${order.date}</td>
+          <td>${order.items}</td>
+          <td>R${parseFloat(order.total).toFixed(2)}</td>
+          <td>${order.type}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function toggleMenu() {
+      const nav = document.getElementById("navLinks");
+      nav.classList.toggle("show");
+    }
+
+    document.addEventListener("click", function (e) {
+      const nav = document.getElementById("navLinks");
+      const toggle = document.querySelector(".menu-toggle");
+      if (!nav.contains(e.target) && !toggle.contains(e.target)) {
+        nav.classList.remove("show");
+      }
+    });
+  </script>
 </body>
 </html>
