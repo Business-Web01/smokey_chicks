@@ -428,104 +428,312 @@ body.menu-page {
 
     </main>
 
-       <script>
+       
+    <script>
+  
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  
 
+  
   function addToCart(itemName, basePrice) {
+  
     const lowerName = itemName.toLowerCase();
+  
     let breadChoice = "";
+  
     let sauceChoice = "";
+  
     let finalPrice = basePrice;
+  
 
+  
     const requiresBread = lowerName.includes("kota") || lowerName.includes("dagwood");
+  
 
+  
     const isExtras = ["egg", "special", "cheese", "vienna", "bacon", "beef patty", "russian", "spoon of artchar"].some(extra =>
+  
       lowerName.includes(extra)
+  
     );
+  
 
+  
     if (requiresBread) {
+  
       const bread = prompt("Choose your bread: Toasted or Plain?")?.trim().toLowerCase();
+  
       if (bread === "toasted") {
+  
         breadChoice = "Toasted Bread";
+  
         finalPrice += 2;
+  
       } else {
+  
         breadChoice = "Plain Bread";
+  
       }
+  
     }
+  
 
+  
     if (!isExtras) {
+  
       const sauce = prompt("Choose your sauce: Hot, Plain, or All?")?.trim().toLowerCase();
+  
       if (sauce === "hot") sauceChoice = "Hot Sauce";
+  
       else if (sauce === "plain") sauceChoice = "Plain Sauce";
+  
       else sauceChoice = "All Sauces";
+  
     }
+  
 
+  
     const description = [itemName];
+  
     if (breadChoice) description.push(breadChoice);
+  
     if (sauceChoice) description.push(sauceChoice);
+  
 
+  
     const existingIndex = cart.findIndex(
+  
       item =>
+  
         item.name === itemName &&
+  
         item.bread === breadChoice &&
+  
         item.sauce === sauceChoice
+  
     );
+  
 
+  
     if (existingIndex !== -1) {
+  
       cart[existingIndex].qty += 1;
+  
     } else {
+  
       cart.push({
+  
         name: itemName,
+  
         price: finalPrice,
+  
         qty: 1,
+  
         bread: breadChoice,
+  
         sauce: sauceChoice
+  
       });
+  
     }
+  
 
+  
     localStorage.setItem("cart", JSON.stringify(cart));
+  
     updateCartCount();
+  
     showCartPopup(`Ayoba! ${description.join(" with ")} added to your cart.`);
+  
   }
+  
 
+  
   function updateCartCount() {
+  
     const counter = document.getElementById("cart-count");
+  
     if (!counter) return;
+  
     const count = cart.reduce((sum, item) => sum + item.qty, 0);
+  
     counter.textContent = count;
+  
   }
+  
 
+  
   function showCartPopup(message) {
+  
   const popup = document.getElementById("cart-popup");
+  
   if (!popup) return;
+  
 
+  
   popup.textContent = `Ayoba! ${message} added to your cart.`;
+  
   popup.style.display = "block";
+  
   popup.style.opacity = "1";
+  
 
+  
   setTimeout(() => {
+  
     popup.style.opacity = "0";
+  
     setTimeout(() => {
+  
       popup.style.display = "none";
+  
     }, 1000); 
+  
   }, 5000); 
+  
 }
+  
 
+  
 
+  
   const canvas = document.getElementById("sparkCanvas");
+  
   if (canvas) {
+  
     const ctx = canvas.getContext("2d");
+  
     canvas.width = window.innerWidth;
+  
     canvas.height = window.innerHeight;
+  
 
+  
     window.addEventListener("resize", () => {
+  
       canvas.width = window.innerWidth;
+  
       canvas.height = window.innerHeight;
+  
     });
+  
 
+  
     const sparks = [];
+  
     function createSpark() {
+  
+      return {
+  
+        x: Math.random() * canvas.width,
+  
+        y: -10,
+  
+        size: Math.random() * 2 + 1,
+  
+        speedY: Math.random() * 1 + 0.5,
+  
+        color: `rgba(255,${Math.floor(Math.random() * 150 + 100)},0,0.8)`
+  
+      };
+  
+    }
+  
+
+  
+    function animateSparks() {
+  
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+      while (sparks.length < 100) sparks.push(createSpark());
+  
+      for (let i = 0; i < sparks.length; i++) {
+  
+        const s = sparks[i];
+  
+        s.y += s.speedY;
+  
+        ctx.beginPath();
+  
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+  
+        ctx.fillStyle = s.color;
+  
+        ctx.fill();
+  
+        if (s.y > canvas.height) sparks.splice(i, 1);
+  
+      }
+  
+      requestAnimationFrame(animateSparks);
+  
+    }
+  
+
+  
+    animateSparks();
+  
+  }
+  
+
+  
+  function toggleMenu() {
+  
+    const nav = document.getElementById("navLinks");
+  
+    nav.classList.toggle("show");
+  
+  }
+  
+
+  
+  document.addEventListener("click", function (e) {
+  
+    const nav = document.getElementById("navLinks");
+  
+    const toggle = document.querySelector(".menu-toggle");
+  
+    if (!nav.contains(e.target) && !toggle.contains(e.target)) {
+  
+      nav.classList.remove("show");
+  
+    }
+  
+  });
+  
+
+  
+window.addEventListener("DOMContentLoaded", () => {
+  
+  const popup = document.getElementById("friday-popup");
+  
+  const blur = document.getElementById("friday-blur");
+  
+
+  
+  popup.style.display = "block";
+  
+  blur.style.display = "block";
+  
+
+  
+  setTimeout(() => {
+  
+    popup.style.display = "none";
+  
+    blur.style.display = "none";
+  
+  }, 5000);
+  
+});
+  
+
+  
+
+  
+    </script>
 
 </body>
 </html>
+
 
