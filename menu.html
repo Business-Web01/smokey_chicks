@@ -428,7 +428,7 @@ body.menu-page {
 
     </main>
 
- <script>
+       <script>
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
   function addToCart(itemName, basePrice) {
@@ -525,61 +525,7 @@ body.menu-page {
 
     const sparks = [];
     function createSpark() {
-      return {
-        x: Math.random() * canvas.width,
-        y: -10,
-        size: Math.random() * 2 + 1,
-        speedY: Math.random() * 1 + 0.5,
-        color: `rgba(255,${Math.floor(Math.random() * 150 + 100)},0,0.8)`
-      };
-    }
-
-    function animateSparks() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      while (sparks.length < 100) sparks.push(createSpark());
-      for (let i = 0; i < sparks.length; i++) {
-        const s = sparks[i];
-        s.y += s.speedY;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-        ctx.fillStyle = s.color;
-        ctx.fill();
-        if (s.y > canvas.height) sparks.splice(i, 1);
-      }
-      requestAnimationFrame(animateSparks);
-    }
-
-    animateSparks();
-  }
-
-  function toggleMenu() {
-    const nav = document.getElementById("navLinks");
-    nav.classList.toggle("show");
-  }
-
-  document.addEventListener("click", function (e) {
-    const nav = document.getElementById("navLinks");
-    const toggle = document.querySelector(".menu-toggle");
-    if (!nav.contains(e.target) && !toggle.contains(e.target)) {
-      nav.classList.remove("show");
-    }
-  });
-
-window.addEventListener("DOMContentLoaded", () => {
-  const popup = document.getElementById("friday-popup");
-  const blur = document.getElementById("friday-blur");
-
-  popup.style.display = "block";
-  blur.style.display = "block";
-
-  setTimeout(() => {
-    popup.style.display = "none";
-    blur.style.display = "none";
-  }, 5000);
-});
-
-
-</script>
 
 </body>
 </html>
+
