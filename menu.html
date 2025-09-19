@@ -481,12 +481,14 @@ body.menu-page {
   
     if (!isExtras) {
   
-      const sauce = prompt("Choose your sauce: Hot, Plain, or All?")?.trim().toLowerCase();
+      const sauce = prompt("Choose your sauce: Hot, Chips, None ?")?.trim().toLowerCase();
   
       if (sauce === "hot") sauceChoice = "Hot Sauce";
   
-      else if (sauce === "plain") sauceChoice = "Plain Sauce";
-  
+      else if (sauce === "chips") sauceChoice = "Chips Sauce";
+
+      else if (sauce === "none") sauceChoice = "No Sauce";
+
       else sauceChoice = "All Sauces";
   
     }
@@ -735,5 +737,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
